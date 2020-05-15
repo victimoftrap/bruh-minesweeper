@@ -1,11 +1,11 @@
-import GameLevel from '@/engine/models/level/GameLevel';
 import GameField from '@/engine/models/GameField';
+import GameLevel from '@/engine/models/level/GameLevel';
 
 export default class Game {
   constructor(
-        private _level: GameLevel,
-        private _field: GameField,
-        private _minesFlagged: number = 0,
+    private _level: GameLevel,
+    private _field: GameField,
+    private _minesFlagged: number = 0,
   ) {
   }
 

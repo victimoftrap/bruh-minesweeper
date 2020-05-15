@@ -3,10 +3,10 @@ import CellState from '@/engine/models/cell/CellState';
 
 export default class Cell {
   constructor(
-        private _point: Point,
-        private _state: CellState,
-        private _minesAround: number = 0,
-        private _isMine: boolean = false,
+    private _point: Point,
+    private _state: CellState,
+    private _minesAround: number = 0,
+    private _isMine: boolean = false,
   ) {
   }
 

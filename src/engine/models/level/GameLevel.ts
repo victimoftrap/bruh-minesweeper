@@ -1,9 +1,9 @@
 export default class GameLevel {
   constructor(
-        private readonly _name: string,
-        private readonly _rows: number,
-        private readonly _columns: number,
-        private readonly _mines: number,
+    private readonly _name: string,
+    private readonly _rows: number,
+    private readonly _columns: number,
+    private readonly _mines: number,
   ) {
   }
 
