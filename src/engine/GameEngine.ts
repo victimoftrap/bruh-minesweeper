@@ -7,24 +7,22 @@ import GameField from '@/engine/models/GameField';
 
 export default class GameEngine {
   private static readonly cellPointCircle: Array<Point> = [
-    {x: -1, y: -1},
-    {x: 0, y: -1},
-    {x: 1, y: -1},
-    {x: -1, y: 0},
-    {x: 1, y: 0},
-    {x: -1, y: 1},
-    {x: 0, y: 1},
-    {x: 1, y: 1},
+    { x: -1, y: -1 },
+    { x: 0, y: -1 },
+    { x: 1, y: -1 },
+    { x: -1, y: 0 },
+    { x: 1, y: 0 },
+    { x: -1, y: 1 },
+    { x: 0, y: 1 },
+    { x: 1, y: 1 },
   ];
-
-  private static game: Game;
 
   private static initGameField(rows: number, columns: number): GameField {
     const gameField: GameField = new GameField(rows, columns);
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < columns; j++) {
         gameField.setCell(
-          new Cell({x: i, y: j}, CellState.CLOSED),
+          new Cell({ x: i, y: j }, CellState.CLOSED),
         );
       }
     }
@@ -53,14 +51,13 @@ export default class GameEngine {
       .filter((pointAround: Point) => () => pointAround.x >= 0
         && pointAround.x < rows
         && pointAround.y >= 0
-        && pointAround.y < columns
-      );
+        && pointAround.y < columns);
   }
 
   private static setMinesAround(gameField: GameField) {
     for (let i = 0; i < gameField.rows; i++) {
       for (let j = 0; j < gameField.columns; j++) {
-        const cell: Cell = gameField.getCell({x: i, y: j});
+        const cell: Cell = gameField.getCell({ x: i, y: j });
 
         this.getPointsAround(cell.point, gameField.rows, gameField.columns)
           .forEach((pointAround: Point) => {
@@ -79,27 +76,26 @@ export default class GameEngine {
 
     this.generateMinesOnField(level, gameField);
     this.setMinesAround(gameField);
-    this.game = new Game(level, gameField);
-    return this.game;
+    return new Game(level, gameField);
   }
 
-  public static openCell(point: Point) {
-    const cell: Cell = this.game.field.getCell(point);
+  public static openCell(game: Game, point: Point) {
+    const cell: Cell = game.field.getCell(point);
     if (cell.state === CellState.FLAGGED) {
       return;
     }
     if (cell.isMine) {
-      this.game.field.fieldArray
+      game.field.fieldArray
         .filter((aCell: Cell) => aCell.isMine)
         .forEach((minedCell: Cell) => minedCell.state = CellState.EXPLODED);
     }
 
     cell.state = CellState.OPENED;
-    this.recursiveCellOpening(point);
+    this.recursiveCellOpening(game, point);
   }
 
-  private static recursiveCellOpening(startPoint: Point) {
-    const gameField: GameField = this.game.field;
+  private static recursiveCellOpening(game: Game, startPoint: Point) {
+    const gameField: GameField = game.field;
 
     this.getPointsAround(startPoint, gameField.rows, gameField.columns)
       .forEach((pointAround: Point) => {
@@ -110,29 +106,33 @@ export default class GameEngine {
         if (cell.minesAround !== 0) {
           return;
         }
-        this.recursiveCellOpening(cell.point);
+        this.recursiveCellOpening(game, cell.point);
       });
   }
 
-  public static flagCell(point: Point) {
-    const cell: Cell = this.game.field.getCell(point);
+  public static flagCell(game: Game, point: Point) {
+    const cell: Cell = game.field.getCell(point);
     if (cell.state === CellState.CLOSED) {
       cell.state = CellState.FLAGGED;
-
       if (cell.isMine) {
-        this.game.minesFlagged++;
+        game.minesFlagged++;
       }
     }
   }
 
-  public static unknownCell(point: Point) {
-    const cell: Cell = this.game.field.getCell(point);
+  public static unknownCell(game: Game, point: Point) {
+    const cell: Cell = game.field.getCell(point);
     if (cell.state === CellState.FLAGGED) {
       cell.state = CellState.UNKNOWN;
     }
   }
 
-  public static isMinesCovered(): boolean {
-    return this.game.minesFlagged === this.game.level.mines;
+  public static unmarkCell(game: Game, point: Point) {
+    const cell: Cell = game.field.getCell(point);
+    cell.state = CellState.CLOSED;
+  }
+
+  public static isMinesCovered(game: Game): boolean {
+    return game.minesFlagged === game.level.mines;
   }
 }
