@@ -19,8 +19,8 @@ export default class GameEngine {
 
   private static initGameField(rows: number, columns: number): GameField {
     const gameField: GameField = new GameField(rows, columns);
-    for (let i = 0; i < rows; i++) {
-      for (let j = 0; j < columns; j++) {
+    for (let i = 0; i < rows; i += 1) {
+      for (let j = 0; j < columns; j += 1) {
         gameField.setCell(
           new Cell({ x: i, y: j }, CellState.CLOSED),
         );
@@ -30,10 +30,9 @@ export default class GameEngine {
   }
 
   private static generateMinesOnField(level: GameLevel, gameField: GameField) {
-    for (let i = 0; i < level.mines; i++) {
+    for (let i = 0; i < level.mines; i += 1) {
       const xCoordinate: number = Math.random() * level.rows;
       const yCoordinate: number = Math.random() * level.columns;
-
       gameField.getCell({
         x: xCoordinate,
         y: yCoordinate,
@@ -55,8 +54,8 @@ export default class GameEngine {
   }
 
   private static setMinesAround(gameField: GameField) {
-    for (let i = 0; i < gameField.rows; i++) {
-      for (let j = 0; j < gameField.columns; j++) {
+    for (let i = 0; i < gameField.rows; i += 1) {
+      for (let j = 0; j < gameField.columns; j += 1) {
         const cell: Cell = gameField.getCell({ x: i, y: j });
 
         this.getPointsAround(cell.point, gameField.rows, gameField.columns)
@@ -87,7 +86,9 @@ export default class GameEngine {
     if (cell.isMine) {
       game.field.fieldArray
         .filter((aCell: Cell) => aCell.isMine)
-        .forEach((minedCell: Cell) => minedCell.state = CellState.EXPLODED);
+        .forEach((minedCell: Cell) => {
+          minedCell.state = CellState.EXPLODED;
+        });
     }
 
     cell.state = CellState.OPENED;
@@ -115,7 +116,7 @@ export default class GameEngine {
     if (cell.state === CellState.CLOSED) {
       cell.state = CellState.FLAGGED;
       if (cell.isMine) {
-        game.minesFlagged++;
+        game.minesFlagged += 1;
       }
     }
   }
