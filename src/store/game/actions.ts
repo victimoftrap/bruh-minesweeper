@@ -22,4 +22,4 @@ export default {
   removeMarkFromCell(context: any, point: Point): void {
     context.commit(types.UNMARK_CELL, point);
   },
-}
+};

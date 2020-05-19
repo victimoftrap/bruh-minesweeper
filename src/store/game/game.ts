@@ -4,6 +4,7 @@ import actions from '@/store/game/actions';
 
 const state: any = {
   game: {},
+  battlefieldArray: [],
 };
 
 export default {

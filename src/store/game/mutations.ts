@@ -5,7 +5,9 @@ import GameEngine from '@/engine/GameEngine';
 
 export default {
   [types.START_NEW_GAME](state: any, levelName: string) {
-    state.game = GameEngine.newGame(levelName);
+    const game = GameEngine.newGame(levelName);
+    state.game = game;
+    state.battlefieldArray = game.field.fieldArray;
   },
 
   [types.OPEN_CELL](state: any, point: Point) {
