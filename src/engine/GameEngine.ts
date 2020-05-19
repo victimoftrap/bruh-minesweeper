@@ -34,7 +34,7 @@ export default class GameEngine {
   private static generateMinesOnField(level: GameLevel, gameField: GameField): void {
     const minesPoints: Array<Point> = new Array<Point>();
 
-    while (minesPoints.length != level.mines) {
+    while (minesPoints.length < level.mines) {
       const point: Point = {
         x: Math.floor(Math.random() * level.rows),
         y: Math.floor(Math.random() * level.columns),
@@ -70,7 +70,7 @@ export default class GameEngine {
             if (gameField.getCell(pointAround).isMine) {
               minesAround += 1;
             }
-            cell.minesAround = minesAround;
+            cell.minesAround += minesAround;
           });
       }
     }
@@ -92,10 +92,13 @@ export default class GameEngine {
     }
     if (cell.isMine) {
       this.explodeAndOpedAllCells(game);
+      return;
     }
 
     cell.state = CellState.OPENED;
-    this.recursiveCellOpening(game, point);
+    if (cell.minesAround === 0) {
+      this.recursiveCellOpening(game, point);
+    }
   }
 
   private static explodeAndOpedAllCells(game: Game): void {
@@ -118,12 +121,17 @@ export default class GameEngine {
     this.getPointsAround(startPoint, gameField.rows, gameField.columns)
       .forEach((pointAround: Point) => {
         const cell: Cell = gameField.getCell(pointAround);
-        if (cell.state === CellState.CLOSED && !cell.isMine) {
-          cell.state = CellState.OPENED;
-        }
-        if (cell.minesAround !== 0) {
+        if (cell.state !== CellState.CLOSED) {
           return;
         }
+        if (cell.isMine) {
+          return;
+        }
+        if (cell.minesAround !== 0) {
+          cell.state = CellState.OPENED;
+          return;
+        }
+        cell.state = CellState.OPENED;
         this.recursiveCellOpening(game, cell.point);
       });
   }
