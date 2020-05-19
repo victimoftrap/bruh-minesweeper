@@ -1,4 +1,4 @@
-import GameField from '@/engine/models/GameField';
+import GameField from '@/engine/models/game/GameField';
 import GameLevel from '@/engine/models/level/GameLevel';
 
 export default class Game {

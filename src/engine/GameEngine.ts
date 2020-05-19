@@ -1,9 +1,11 @@
 import Point from '@/engine/models/cell/Point';
 import Cell from '@/engine/models/cell/Cell';
 import CellState from '@/engine/models/cell/CellState';
-import Game from '@/engine/models/Game';
+import Game from '@/engine/models/game/Game';
 import GameLevel from '@/engine/models/level/GameLevel';
-import GameField from '@/engine/models/GameField';
+import GameField from '@/engine/models/game/GameField';
+
+import { getLevelByName } from '@/engine/models/level/Levels';
 
 export default class GameEngine {
   private static readonly cellPointCircle: Array<Point> = [
@@ -29,15 +31,19 @@ export default class GameEngine {
     return gameField;
   }
 
-  private static generateMinesOnField(level: GameLevel, gameField: GameField) {
-    for (let i = 0; i < level.mines; i += 1) {
-      const xCoordinate: number = Math.random() * level.rows;
-      const yCoordinate: number = Math.random() * level.columns;
-      gameField.getCell({
-        x: xCoordinate,
-        y: yCoordinate,
-      })
-        .isMine = true;
+  private static generateMinesOnField(level: GameLevel, gameField: GameField): void {
+    const minesPoints: Array<Point> = new Array<Point>();
+
+    while (minesPoints.length != level.mines) {
+      const point: Point = {
+        x: Math.floor(Math.random() * level.rows),
+        y: Math.floor(Math.random() * level.columns),
+      };
+
+      if (!minesPoints.includes(point)) {
+        minesPoints.push(point);
+        gameField.getCell(point).isMine = true;
+      }
     }
   }
 
@@ -47,13 +53,13 @@ export default class GameEngine {
         x: point.x + pointAround.x,
         y: point.y + pointAround.y,
       }))
-      .filter((pointAround: Point) => () => pointAround.x >= 0
+      .filter((pointAround: Point) => pointAround.x >= 0
         && pointAround.x < rows
         && pointAround.y >= 0
         && pointAround.y < columns);
   }
 
-  private static setMinesAround(gameField: GameField) {
+  private static setMinesAround(gameField: GameField): void {
     for (let i = 0; i < gameField.rows; i += 1) {
       for (let j = 0; j < gameField.columns; j += 1) {
         const cell: Cell = gameField.getCell({ x: i, y: j });
@@ -70,7 +76,8 @@ export default class GameEngine {
     }
   }
 
-  public static newGame(level: GameLevel): Game {
+  public static newGame(levelName: string): Game {
+    const level: GameLevel = getLevelByName(levelName);
     const gameField: GameField = this.initGameField(level.rows, level.columns);
 
     this.generateMinesOnField(level, gameField);
@@ -78,24 +85,34 @@ export default class GameEngine {
     return new Game(level, gameField);
   }
 
-  public static openCell(game: Game, point: Point) {
+  public static openCell(game: Game, point: Point): void {
     const cell: Cell = game.field.getCell(point);
     if (cell.state === CellState.FLAGGED) {
       return;
     }
     if (cell.isMine) {
-      game.field.fieldArray
-        .filter((aCell: Cell) => aCell.isMine)
-        .forEach((minedCell: Cell) => {
-          minedCell.state = CellState.EXPLODED;
-        });
+      this.explodeAndOpedAllCells(game);
     }
 
     cell.state = CellState.OPENED;
     this.recursiveCellOpening(game, point);
   }
 
-  private static recursiveCellOpening(game: Game, startPoint: Point) {
+  private static explodeAndOpedAllCells(game: Game): void {
+    game.field.fieldArray
+      .forEach((fieldRow: Array<Cell>) => {
+        fieldRow.forEach((aCell: Cell) => {
+          if (aCell.state === CellState.CLOSED) {
+            aCell.state = CellState.OPENED;
+          }
+          if (aCell.isMine) {
+            aCell.state = CellState.EXPLODED;
+          }
+        });
+      });
+  }
+
+  private static recursiveCellOpening(game: Game, startPoint: Point): void {
     const gameField: GameField = game.field;
 
     this.getPointsAround(startPoint, gameField.rows, gameField.columns)
@@ -111,7 +128,7 @@ export default class GameEngine {
       });
   }
 
-  public static flagCell(game: Game, point: Point) {
+  public static flagCell(game: Game, point: Point): void {
     const cell: Cell = game.field.getCell(point);
     if (cell.state === CellState.CLOSED) {
       cell.state = CellState.FLAGGED;
@@ -121,14 +138,14 @@ export default class GameEngine {
     }
   }
 
-  public static unknownCell(game: Game, point: Point) {
+  public static unknownCell(game: Game, point: Point): void {
     const cell: Cell = game.field.getCell(point);
     if (cell.state === CellState.FLAGGED) {
       cell.state = CellState.UNKNOWN;
     }
   }
 
-  public static unmarkCell(game: Game, point: Point) {
+  public static unmarkCell(game: Game, point: Point): void {
     const cell: Cell = game.field.getCell(point);
     cell.state = CellState.CLOSED;
   }

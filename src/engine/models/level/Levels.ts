@@ -10,3 +10,17 @@ export const levels: Record<LevelType, GameLevel> = {
   expert:
     new GameLevel('Expert', 16, 30, 99),
 };
+
+export const getLevelByName = (name: string): GameLevel => {
+  const lowerName = name.toLowerCase();
+  if (lowerName === 'beginner') {
+    return levels.beginner;
+  }
+  if (lowerName === 'intermediate') {
+    return levels.intermediate;
+  }
+  if (lowerName === 'expert') {
+    return levels.expert;
+  }
+  return levels.beginner;
+};
