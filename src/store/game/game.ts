@@ -1,5 +1,6 @@
 import mutations from '@/store/game/mutations';
 import getters from '@/store/game/getters';
+import actions from '@/store/game/actions';
 
 const state: any = {
   game: {},
@@ -9,6 +10,6 @@ export default {
   namespaced: true,
   state,
   mutations,
-  actions: {},
+  actions,
   getters,
 };

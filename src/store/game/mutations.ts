@@ -1,12 +1,11 @@
 import * as types from '@/store/game/mutationTypes';
 
 import Point from '@/engine/models/cell/Point';
-import GameLevel from '@/engine/models/level/GameLevel';
 import GameEngine from '@/engine/GameEngine';
 
 export default {
-  [types.START_NEW_GAME](state: any, level: GameLevel) {
-    state.game = GameEngine.newGame(level);
+  [types.START_NEW_GAME](state: any, levelName: string) {
+    state.game = GameEngine.newGame(levelName);
   },
 
   [types.OPEN_CELL](state: any, point: Point) {
