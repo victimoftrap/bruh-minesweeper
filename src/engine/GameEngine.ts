@@ -40,7 +40,7 @@ export default class GameEngine {
         y: Math.floor(Math.random() * level.columns),
       };
 
-      if (!minesPoints.includes(point)) {
+      if (minesPoints.findIndex((e: Point) => e.x === point.x && e.y === point.y) === -1) {
         minesPoints.push(point);
         gameField.getCell(point).isMine = true;
       }
