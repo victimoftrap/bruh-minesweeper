@@ -11,15 +11,7 @@ export default {
     context.commit(types.OPEN_CELL, point);
   },
 
-  setFlagOnCell(context: any, point: Point): void {
-    context.commit(types.FLAG_CELL, point);
-  },
-
-  markCellAsUnknown(context: any, point: Point): void {
-    context.commit(types.UNKNOWN_CELL, point);
-  },
-
-  removeMarkFromCell(context: any, point: Point): void {
-    context.commit(types.UNMARK_CELL, point);
+  cellRightAction(context: any, point: Point): void {
+    context.commit(types.CELL_RIGHT_ACTION, point);
   },
 };

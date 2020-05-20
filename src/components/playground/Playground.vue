@@ -7,13 +7,13 @@
       <div
         class="battlefield__row"
         v-for="row in battlefieldArray"
-        v-bind:key="row"
+        v-bind:key="row.length"
       >
         <battlefield-cell
           class="battlefield__cell"
           v-for="cell in row"
-          v-bind:key="cell"
           v-bind:cell="cell"
+          v-bind:key="`${cell.point.x + cell.point.y}`"
         />
       </div>
     </div>

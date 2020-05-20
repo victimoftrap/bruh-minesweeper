@@ -40,7 +40,7 @@ export default class GameEngine {
         y: Math.floor(Math.random() * level.columns),
       };
 
-      if (!minesPoints.includes(point)) {
+      if (minesPoints.findIndex((e: Point) => e.x === point.x && e.y === point.y) === -1) {
         minesPoints.push(point);
         gameField.getCell(point).isMine = true;
       }
@@ -136,8 +136,24 @@ export default class GameEngine {
       });
   }
 
-  public static flagCell(game: Game, point: Point): void {
+  public static cellRightAction(game: Game, point: Point): void {
     const cell: Cell = game.field.getCell(point);
+    const cellState: CellState = cell.state;
+    if (cellState === CellState.OPENED) {
+      return;
+    }
+    if (cellState === CellState.CLOSED) {
+      this.flagCell(game, cell);
+      return;
+    }
+    if (cellState === CellState.FLAGGED) {
+      this.unknownCell(game, cell);
+      return;
+    }
+    this.unmarkCell(game, cell);
+  }
+
+  private static flagCell(game: Game, cell: Cell): void {
     if (cell.state === CellState.CLOSED) {
       cell.state = CellState.FLAGGED;
       if (cell.isMine) {
@@ -146,16 +162,20 @@ export default class GameEngine {
     }
   }
 
-  public static unknownCell(game: Game, point: Point): void {
-    const cell: Cell = game.field.getCell(point);
+  private static unknownCell(game: Game, cell: Cell): void {
     if (cell.state === CellState.FLAGGED) {
       cell.state = CellState.UNKNOWN;
+      if (cell.isMine) {
+        game.minesFlagged -= 1;
+      }
     }
   }
 
-  public static unmarkCell(game: Game, point: Point): void {
-    const cell: Cell = game.field.getCell(point);
+  private static unmarkCell(game: Game, cell: Cell): void {
     cell.state = CellState.CLOSED;
+    if (cell.isMine) {
+      game.minesFlagged -= 1;
+    }
   }
 
   public static isMinesCovered(game: Game): boolean {
