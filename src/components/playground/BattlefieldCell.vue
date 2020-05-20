@@ -58,7 +58,7 @@ export default {
     },
 
     onRightClick() {
-      this.$store.dispatch('game/setFlagOnCell', this.cell.point);
+      this.$store.dispatch('game/cellRightAction', this.cell.point);
     },
   },
 };

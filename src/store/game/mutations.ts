@@ -14,15 +14,7 @@ export default {
     GameEngine.openCell(state.game, point);
   },
 
-  [types.FLAG_CELL](state: any, point: Point) {
-    GameEngine.flagCell(state.game, point);
-  },
-
-  [types.UNKNOWN_CELL](state: any, point: Point) {
-    GameEngine.unknownCell(state.game, point);
-  },
-
-  [types.UNMARK_CELL](state: any, point: Point) {
-    GameEngine.unmarkCell(state.game, point);
+  [types.CELL_RIGHT_ACTION](state: any, point: Point) {
+    GameEngine.cellRightAction(state.game, point);
   },
 };
