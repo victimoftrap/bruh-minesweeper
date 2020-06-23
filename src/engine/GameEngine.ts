@@ -156,26 +156,27 @@ export default class GameEngine {
   private static flagCell(game: Game, cell: Cell): void {
     if (cell.state === CellState.CLOSED) {
       cell.state = CellState.FLAGGED;
+
       if (cell.isMine) {
         game.minesFlagged += 1;
       }
+      game.cellsFlagged += 1;
     }
   }
 
   private static unknownCell(game: Game, cell: Cell): void {
     if (cell.state === CellState.FLAGGED) {
       cell.state = CellState.UNKNOWN;
+
       if (cell.isMine) {
         game.minesFlagged -= 1;
       }
+      game.cellsFlagged -= 1;
     }
   }
 
   private static unmarkCell(game: Game, cell: Cell): void {
     cell.state = CellState.CLOSED;
-    if (cell.isMine) {
-      game.minesFlagged -= 1;
-    }
   }
 
   public static isMinesCovered(game: Game): boolean {
