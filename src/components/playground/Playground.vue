@@ -14,7 +14,7 @@
           class="battlefield__cell"
           v-for="cell in row"
           v-bind:cell="cell"
-          v-bind:key="`${cell.point.x + cell.point.y}`"
+          v-bind:key="`${cell.point.x}${cell.point.y}`"
         />
       </div>
     </div>

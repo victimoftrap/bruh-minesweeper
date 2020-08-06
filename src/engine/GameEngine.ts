@@ -2,10 +2,8 @@ import Point from '@/engine/models/cell/Point';
 import Cell from '@/engine/models/cell/Cell';
 import CellState from '@/engine/models/cell/CellState';
 import Game from '@/engine/models/game/Game';
-import GameLevel from '@/engine/models/level/GameLevel';
 import GameField from '@/engine/models/game/GameField';
-
-import { getLevelByName } from '@/engine/models/level/Levels';
+import GameConfiguration from '@/engine/models/level/GameConfiguration';
 
 export default class GameEngine {
   private static readonly cellPointCircle: Array<Point> = [
@@ -31,7 +29,7 @@ export default class GameEngine {
     return gameField;
   }
 
-  private static generateMinesOnField(level: GameLevel, gameField: GameField): void {
+  private static generateMinesOnField(level: GameConfiguration, gameField: GameField): void {
     const minesPoints: Array<Point> = new Array<Point>();
 
     while (minesPoints.length < level.mines) {
@@ -76,13 +74,12 @@ export default class GameEngine {
     }
   }
 
-  public static newGame(levelName: string): Game {
-    const level: GameLevel = getLevelByName(levelName);
-    const gameField: GameField = this.initGameField(level.rows, level.columns);
+  public static newGame(config: GameConfiguration): Game {
+    const gameField: GameField = this.initGameField(config.rows, config.columns);
 
-    this.generateMinesOnField(level, gameField);
+    this.generateMinesOnField(config, gameField);
     this.setMinesAround(gameField);
-    return new Game(level, gameField);
+    return new Game(config, gameField);
   }
 
   public static openCell(game: Game, point: Point): void {
