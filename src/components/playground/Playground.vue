@@ -3,7 +3,7 @@
     class="playground"
     v-show="battlefieldArray.length !== 0"
   >
-    <mines-counter/>
+    <flags-counter/>
     <div class="playground__battlefield battlefield">
       <div
         class="battlefield__row"
@@ -25,12 +25,12 @@
 import { mapState } from 'vuex';
 
 import BattlefieldCell from './BattlefieldCell.vue';
-import MinesCounter from './MinesCounter.vue';
+import FlagsCounter from './FlagsCounter.vue';
 
 export default {
   name: 'Playground',
   components: {
-    MinesCounter,
+    FlagsCounter,
     BattlefieldCell,
   },
   computed: {

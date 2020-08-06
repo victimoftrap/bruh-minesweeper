@@ -1,7 +1,7 @@
 <template>
-  <div class="mines-counter">
-    <p class="mines-counter__counter">
-      Mines {{ cellsFlagged }} / {{ levelMines }}
+  <div class="flags-counter">
+    <p class="flags-counter__text">
+      Flags {{ cellsFlagged }} / {{ levelMines }}
     </p>
   </div>
 </template>
@@ -10,7 +10,7 @@
 import { mapState } from 'vuex';
 
 export default {
-  name: 'MinesCounter',
+  name: 'FlagsCounter',
   computed: {
     ...mapState({
       cellsFlagged: (state) => state.game.game.cellsFlagged,
@@ -22,7 +22,7 @@ export default {
 </script>
 
 <style lang="css" scoped>
-  .mines-counter {
+  .flags-counter {
     text-align: center;
   }
 </style>
