@@ -1,6 +1,6 @@
 <template>
   <header class="header">
-    <h1 class="header__title">Minesweeper</h1>
+    <h1 class="header__title">BruhMinesweeper</h1>
     <ul class="header__difficulty-select difficulty-select">
       <li
         class="difficulty-select__item"

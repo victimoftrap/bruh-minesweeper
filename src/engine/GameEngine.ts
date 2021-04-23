@@ -105,6 +105,7 @@ export default class GameEngine {
     }
     if (cell.isMine) {
       this.explodeAndOpedAllCells(game);
+      game.state = 'LOSE';
       return;
     }
 
@@ -126,9 +127,6 @@ export default class GameEngine {
             aCell.state = CellState.OPENED;
           }
           if (aCell.state === CellState.FLAGGED && !aCell.isMine) {
-            aCell.state = CellState.OPENED;
-          }
-          if (aCell.state === CellState.UNKNOWN && !aCell.isMine) {
             aCell.state = CellState.OPENED;
           }
           if (aCell.isMine && aCell.state !== CellState.FLAGGED) {
@@ -159,6 +157,17 @@ export default class GameEngine {
       });
   }
 
+  private static openAllCells(game: Game): void {
+    game.field.fieldArray
+      .forEach((fieldRow: Array<Cell>) => {
+        fieldRow.forEach((aCell: Cell) => {
+          if (aCell.state === CellState.CLOSED || aCell.state === CellState.UNKNOWN) {
+            aCell.state = CellState.OPENED;
+          }
+        });
+      });
+  }
+
   public static cellRightAction(game: Game, point: Point): void {
     const cell: Cell = game.field.getCell(point);
     const cellState: CellState = cell.state;
@@ -182,6 +191,10 @@ export default class GameEngine {
 
       if (cell.isMine) {
         game.minesFlagged += 1;
+        if (game.minesFlagged === game.level.mines) {
+          game.state = 'WIN';
+          this.openAllCells(game);
+        }
       }
       game.cellsFlagged += 1;
     }
