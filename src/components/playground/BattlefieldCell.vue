@@ -15,6 +15,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import CellState from '../../engine/models/cell/CellState';
 
 export default {
@@ -24,6 +25,11 @@ export default {
       type: Object,
       required: true,
     },
+  },
+  computed: {
+    ...mapState({
+      gameState: (state) => state.game.game.state,
+    }),
   },
   data() {
     return {
@@ -54,11 +60,15 @@ export default {
     },
 
     onLeftClick() {
-      this.$store.dispatch('game/openCell', this.cell.point);
+      if (this.gameState === 'RUNNING') {
+        this.$store.dispatch('game/openCell', this.cell.point);
+      }
     },
 
     onRightClick() {
-      this.$store.dispatch('game/cellRightAction', this.cell.point);
+      if (this.gameState === 'RUNNING') {
+        this.$store.dispatch('game/cellRightAction', this.cell.point);
+      }
     },
   },
 };

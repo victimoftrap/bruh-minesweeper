@@ -3,7 +3,7 @@ enum CellState {
   OPENED = 'OPENED',
   FLAGGED = 'FLAGGED',
   UNKNOWN = 'UNKNOWN',
-  EXPLODED = 'EXPLODED'
+  EXPLODED = 'EXPLODED',
 }
 
 export default CellState;

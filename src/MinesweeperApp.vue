@@ -1,25 +1,23 @@
 <template>
-  <main class="minesweeper">
-    <h1 class="minesweeper__title">
-      Minesweeper
-    </h1>
-
-    <section class="minesweeper__game-content">
-      <level-select/>
-      <playground/>
-    </section>
-  </main>
+  <div id="app">
+    <menu-header/>
+    <main class="minesweeper">
+      <section class="minesweeper__game-content">
+        <playground/>
+      </section>
+    </main>
+  </div>
 </template>
 
 <script>
-import LevelSelect from './components/level/LevelSelect.vue';
+import MenuHeader from './components/header/MenuHeader.vue';
 import Playground from './components/playground/Playground.vue';
 
 export default {
   name: 'MinesweeperApp',
   components: {
     Playground,
-    LevelSelect,
+    MenuHeader,
   },
 };
 </script>
@@ -30,19 +28,12 @@ export default {
     margin: 0;
     padding: 0;
     background-color: #fafafa;
+    font-family: Helvetica, sans-serif;
   }
 
   .minesweeper {
     display: flex;
     flex-direction: column;
-  }
-
-  .minesweeper__title {
-    text-align: center;
-    color: #2c3e50;
-    font-family: Helvetica, sans-serif;
-    margin: 30px 0 40px;
-    text-decoration: underline;
   }
 
   .minesweeper__game-content {

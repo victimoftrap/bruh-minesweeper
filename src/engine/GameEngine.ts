@@ -2,10 +2,9 @@ import Point from '@/engine/models/cell/Point';
 import Cell from '@/engine/models/cell/Cell';
 import CellState from '@/engine/models/cell/CellState';
 import Game from '@/engine/models/game/Game';
-import GameLevel from '@/engine/models/level/GameLevel';
 import GameField from '@/engine/models/game/GameField';
-
-import { getLevelByName } from '@/engine/models/level/Levels';
+import GameConfiguration from '@/engine/models/level/GameConfiguration';
+import { MinesGeneration } from './models/game/MinesGeneration';
 
 export default class GameEngine {
   private static readonly cellPointCircle: Array<Point> = [
@@ -19,6 +18,8 @@ export default class GameEngine {
     { x: 1, y: 1 },
   ];
 
+  private static firstlyClicked = false;
+
   private static initGameField(rows: number, columns: number): GameField {
     const gameField: GameField = new GameField(rows, columns);
     for (let i = 0; i < rows; i += 1) {
@@ -29,22 +30,6 @@ export default class GameEngine {
       }
     }
     return gameField;
-  }
-
-  private static generateMinesOnField(level: GameLevel, gameField: GameField): void {
-    const minesPoints: Array<Point> = new Array<Point>();
-
-    while (minesPoints.length < level.mines) {
-      const point: Point = {
-        x: Math.floor(Math.random() * level.rows),
-        y: Math.floor(Math.random() * level.columns),
-      };
-
-      if (minesPoints.findIndex((e: Point) => e.x === point.x && e.y === point.y) === -1) {
-        minesPoints.push(point);
-        gameField.getCell(point).isMine = true;
-      }
-    }
   }
 
   private static getPointsAround(point: Point, rows: number, columns: number): Array<Point> {
@@ -76,13 +61,41 @@ export default class GameEngine {
     }
   }
 
-  public static newGame(levelName: string): Game {
-    const level: GameLevel = getLevelByName(levelName);
-    const gameField: GameField = this.initGameField(level.rows, level.columns);
+  private static generateMinesOnField(
+    level: GameConfiguration, gameField: GameField, skipPoint?: Point,
+  ): void {
+    const minesPoints: Array<Point> = new Array<Point>();
 
-    this.generateMinesOnField(level, gameField);
+    let aroundSkip: Array<Point> = new Array<Point>();
+    if (skipPoint !== undefined) {
+      aroundSkip = this.getPointsAround(skipPoint, level.rows, level.columns);
+      aroundSkip.push(skipPoint);
+    }
+
+    while (minesPoints.length < level.mines) {
+      const point: Point = {
+        x: Math.floor(Math.random() * level.rows),
+        y: Math.floor(Math.random() * level.columns),
+      };
+
+      if (minesPoints.findIndex((e: Point) => e.x === point.x && e.y === point.y) === -1
+        && aroundSkip.findIndex((e: Point) => e.x === point.x && e.y === point.y) === -1
+      ) {
+        minesPoints.push(point);
+        gameField.getCell(point).isMine = true;
+      }
+    }
     this.setMinesAround(gameField);
-    return new Game(level, gameField);
+  }
+
+  public static newGame(levelConfig: GameConfiguration, minesGeneration: MinesGeneration): Game {
+    const gameField: GameField = this.initGameField(levelConfig.rows, levelConfig.columns);
+
+    this.firstlyClicked = false;
+    if (minesGeneration === 'OnStart') {
+      this.generateMinesOnField(levelConfig, gameField);
+    }
+    return new Game(levelConfig, minesGeneration, gameField);
   }
 
   public static openCell(game: Game, point: Point): void {
@@ -92,10 +105,15 @@ export default class GameEngine {
     }
     if (cell.isMine) {
       this.explodeAndOpedAllCells(game);
+      game.state = 'LOSE';
       return;
     }
 
     cell.state = CellState.OPENED;
+    if (game.minesGeneration === 'OnFirstClick' && !this.firstlyClicked) {
+      this.generateMinesOnField(game.level, game.field, point);
+      this.firstlyClicked = true;
+    }
     if (cell.minesAround === 0) {
       this.recursiveCellOpening(game, point);
     }
@@ -108,7 +126,10 @@ export default class GameEngine {
           if (aCell.state === CellState.CLOSED) {
             aCell.state = CellState.OPENED;
           }
-          if (aCell.isMine) {
+          if (aCell.state === CellState.FLAGGED && !aCell.isMine) {
+            aCell.state = CellState.OPENED;
+          }
+          if (aCell.isMine && aCell.state !== CellState.FLAGGED) {
             aCell.state = CellState.EXPLODED;
           }
         });
@@ -136,6 +157,17 @@ export default class GameEngine {
       });
   }
 
+  private static openAllCells(game: Game): void {
+    game.field.fieldArray
+      .forEach((fieldRow: Array<Cell>) => {
+        fieldRow.forEach((aCell: Cell) => {
+          if (aCell.state === CellState.CLOSED || aCell.state === CellState.UNKNOWN) {
+            aCell.state = CellState.OPENED;
+          }
+        });
+      });
+  }
+
   public static cellRightAction(game: Game, point: Point): void {
     const cell: Cell = game.field.getCell(point);
     const cellState: CellState = cell.state;
@@ -159,6 +191,10 @@ export default class GameEngine {
 
       if (cell.isMine) {
         game.minesFlagged += 1;
+        if (game.minesFlagged === game.level.mines) {
+          game.state = 'WIN';
+          this.openAllCells(game);
+        }
       }
       game.cellsFlagged += 1;
     }
