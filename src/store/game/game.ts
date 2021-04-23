@@ -3,7 +3,8 @@ import getters from '@/store/game/getters';
 import actions from '@/store/game/actions';
 
 const state: any = {
-  gameConfig: {},
+  levelConfig: {},
+  minesGeneration: 'OnStart',
   game: {},
   battlefieldArray: [],
 };

@@ -18,6 +18,23 @@
         </button>
       </li>
     </ul>
+    <ul class="header__mines-generation mines-generation">
+      <li
+        class="mines-generation__item"
+        v-for="minesOpt in minesGenerationOptions"
+        v-bind:key="minesOpt.name"
+      >
+        <button
+          class="mines-generation__button"
+          v-bind:class="{
+            'mines-generation__button_pressed': minesOpt.id === selectedMinesGeneration
+          }"
+          v-on:click="selectMinesGeneration"
+        >
+          {{ minesOpt.name }}
+        </button>
+      </li>
+    </ul>
     <button
      class="header__start-button"
      v-on:click="newGame"
@@ -38,15 +55,27 @@ export default {
         { name: 'Expert' },
       ],
       selectedLevel: 'Beginner',
+      minesGenerationOptions: [
+        { id: 'OnStart', name: 'Mines on start' },
+        { id: 'OnFirstClick', name: 'Mines on first click' },
+      ],
+      selectedMinesGeneration: 'OnFirstClick',
     };
   },
   mounted() {
     this.$store.dispatch('game/chooseGameLevel', this.selectedLevel);
+    this.$store.dispatch('game/chooseMinesGeneration', this.selectedMinesGeneration);
   },
   methods: {
     selectLevelDifficulty(event) {
       this.selectedLevel = event.target.innerText;
       this.$store.dispatch('game/chooseGameLevel', this.selectedLevel);
+    },
+
+    selectMinesGeneration(event) {
+      this.selectedMinesGeneration = this.minesGenerationOptions
+        .find((opt) => opt.name === event.target.innerText).id;
+      this.$store.dispatch('game/chooseMinesGeneration', this.selectedMinesGeneration);
     },
 
     newGame() {
@@ -72,18 +101,18 @@ export default {
     letter-spacing: -2px;
   }
 
-  .difficulty-select {
+  .difficulty-select, .mines-generation {
     margin: 0;
     padding: 0;
     display: flex;
   }
 
-  .difficulty-select__item {
+  .difficulty-select__item, .mines-generation__item {
     list-style: none;
     background-color: white;
   }
 
-  .difficulty-select__button {
+  .difficulty-select__button, .mines-generation__button {
     height: 100%;
     color: white;
     font-size: 16px;
@@ -91,9 +120,15 @@ export default {
     background-color: #3F7FBF;
   }
 
-  .difficulty-select__button:hover {
+  .difficulty-select__button:hover, .mines-generation__button:hover {
     content: '';
     cursor: pointer;
+    border: 1px white solid;
+  }
+
+  .difficulty-select__button_pressed, .mines-generation__button_pressed {
+    color: #2c3e50;
+    background-color: white;
     border: 1px white solid;
   }
 
@@ -103,11 +138,5 @@ export default {
     background-color: white;
     cursor: pointer;
     font-size: 16px;
-  }
-
-  .difficulty-select__button_pressed {
-    color: #2c3e50;
-    background-color: white;
-    border: 1px white solid;
   }
 </style>

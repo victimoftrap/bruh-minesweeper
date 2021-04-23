@@ -1,9 +1,11 @@
 import GameField from '@/engine/models/game/GameField';
 import GameConfiguration from '@/engine/models/level/GameConfiguration';
+import { MinesGeneration } from './MinesGeneration';
 
 export default class Game {
   constructor(
     private _level: GameConfiguration,
+    private _minesGeneration: MinesGeneration,
     private _field: GameField,
     private _cellsFlagged: number = 0,
     private _minesFlagged: number = 0,
@@ -16,6 +18,14 @@ export default class Game {
 
   set level(level: GameConfiguration) {
     this._level = level;
+  }
+
+  get minesGeneration(): MinesGeneration {
+    return this._minesGeneration;
+  }
+
+  set minesGeneration(generation: MinesGeneration) {
+    this._minesGeneration = generation;
   }
 
   get field(): GameField {
